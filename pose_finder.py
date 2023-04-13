@@ -1,6 +1,7 @@
 import pygame
 
 from constants import Constants
+from robot import Robot
 
 
 class PoseFinder:
@@ -22,11 +23,18 @@ class PoseFinder:
         self.field_drawing_rect = self.field_drawing.get_rect()
         self.field_drawing_rect.center = self.screen.get_rect().center
 
+        # Create robot instance.
+        self.robot = Robot(
+            width=Constants.ROBOT_WIDTH_PIXELS, height=Constants.ROBOT_HEIGHT_PIXELS,
+            color=Constants.ROBOT_COLOR, line_width=Constants.ROBOT_LINE_WIDTH
+        )
+
     def run_game(self):
         """Run the game."""
         self.running = True
         while (self.running):
             self.check_events()
+            self.robot.update_position(pygame.mouse.get_pos())
             self.draw_elements()
 
         # End the game.
@@ -58,6 +66,12 @@ class PoseFinder:
 
         # Draw the field drawing.
         self.screen.blit(self.field_drawing, self.field_drawing_rect)
+
+        # Draw the robot.
+        pygame.draw.rect(
+            self.screen, color=self.robot.color,
+            rect=self.robot.rect, width=self.robot.line_width
+        )
 
         # Flip to newly drawn screen.
         pygame.display.flip()

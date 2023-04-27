@@ -1,3 +1,4 @@
+import math
 import pygame
 
 from constants import Constants
@@ -29,6 +30,10 @@ class PoseFinder:
             color=Constants.ROBOT_COLOR, line_width=Constants.ROBOT_LINE_WIDTH
         )
 
+        # Distance mode.
+        self.distance_mode = False
+        self.start_pose = None
+
     def run_game(self):
         """Run the game."""
         self.running = True
@@ -45,10 +50,30 @@ class PoseFinder:
         for event in pygame.event.get():
             if (event.type == pygame.QUIT):
                 self.running = False
+            elif (event.type == pygame.KEYDOWN):
+                self.handle_keydown_events(event.key)
             elif (event.type == pygame.MOUSEBUTTONDOWN):
-                mouse_coords = event.pos
-                field_pose = self.get_field_pose(mouse_coords)
-                print(field_pose)
+                field_pose = self.get_field_pose(event.pos)
+                print(f"\nPose: {field_pose}")
+
+                if (self.distance_mode):
+                    if (self.start_pose):
+                        distance = self.calc_distance(self.start_pose, field_pose)
+                        print(f"Distance: {distance}")
+                        self.start_pose = None
+                    else:
+                        self.start_pose = field_pose
+
+    def handle_keydown_events(self, key):
+        """Handle keydown events."""
+        if (key == pygame.K_ESCAPE):
+            self.running = False
+        elif (key == pygame.K_d):
+            self.distance_mode = True
+            print("\nDistance mode activated")
+        elif (key == pygame.K_p):
+            self.distance_mode = False
+            print("\nPose mode activated")
 
     def get_field_pose(self, mouse_coords):
         """Convert mouse coords to field pose."""
@@ -60,6 +85,12 @@ class PoseFinder:
 
         return (field_x, field_y)
     
+    def calc_distance(self, start_pose, end_pose):
+        """Find the euclidean distance between 2 poses."""
+        dx = start_pose[0] - end_pose[0]
+        dy = start_pose[1] - end_pose[1]
+        return math.sqrt(dx ** 2 + dy ** 2)
+
     def draw_elements(self):
         # Fill background with white.
         self.screen.fill(Constants.BACKGROUND_COLOR)

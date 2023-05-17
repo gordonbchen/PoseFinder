@@ -33,13 +33,17 @@ class PoseFinder:
         # Distance mode.
         self.distance_mode = False
         self.start_pose = None
+        
+        # Horizontal and vertical mode.
+        self.horizontal_mode = False
+        self.vertical_mode = False
 
     def run_game(self):
         """Run the game."""
         self.running = True
         while (self.running):
             self.check_events()
-            self.robot.update_position(pygame.mouse.get_pos())
+            self.update_robot_pose()
             self.draw_elements()
 
         # End the game.
@@ -53,7 +57,7 @@ class PoseFinder:
             elif (event.type == pygame.KEYDOWN):
                 self.handle_keydown_events(event.key)
             elif (event.type == pygame.MOUSEBUTTONDOWN):
-                field_pose = self.get_field_pose(event.pos)
+                field_pose = self.get_field_pose()
                 print(f"\nPose: {field_pose}")
 
                 if (self.distance_mode):
@@ -74,10 +78,25 @@ class PoseFinder:
         elif (key == pygame.K_p):
             self.distance_mode = False
             print("\nPose mode activated")
+        elif (key == pygame.K_h):
+            if (self.horizontal_mode):
+                self.horizontal_mode = False
+                print("\nHorizontal mode deactivated")
+            else:
+                self.horizontal_mode = True
+                print("\nHorizontal mode activated")
+        elif (key == pygame.K_v):
+            if (self.vertical_mode):
+                self.vertical_mode = False
+                print("\Vertical mode deactivated")
+            else:
+                self.vertical_mode = True
+                print("\Vertical mode activated")
 
-    def get_field_pose(self, mouse_coords):
-        """Convert mouse coords to field pose."""
-        pixel_x, pixel_y = mouse_coords
+
+    def get_field_pose(self):
+        """Convert robot coords to field pose."""
+        pixel_x, pixel_y = self.robot.rect.center
         pixel_y = Constants.SCREEN_HEIGHT_PIXELS - pixel_y
 
         field_x = pixel_x * Constants.WIDTH_METERS_PER_PIXEL
@@ -90,6 +109,15 @@ class PoseFinder:
         dx = start_pose[0] - end_pose[0]
         dy = start_pose[1] - end_pose[1]
         return math.sqrt(dx ** 2 + dy ** 2)
+    
+    def update_robot_pose(self):
+        """Update the robot pose."""
+        new_robot_pose = list(pygame.mouse.get_pos())
+        if (self.horizontal_mode):
+            new_robot_pose[1] = self.robot.rect.centery
+        if (self.vertical_mode):
+            new_robot_pose[0] = self.robot.rect.centerx
+        self.robot.update_position(new_robot_pose)
 
     def draw_elements(self):
         # Fill background with white.

@@ -62,8 +62,8 @@ class PoseFinder:
 
                 if (self.distance_mode):
                     if (self.start_pose):
-                        distance = self.calc_distance(self.start_pose, field_pose)
-                        print(f"Distance: {distance}")
+                        dx, dy = self.calc_distance(self.start_pose, field_pose)
+                        print(f"Distance (dx, dy): ({dx}, {dy})")
                         self.start_pose = None
                     else:
                         self.start_pose = field_pose
@@ -73,11 +73,12 @@ class PoseFinder:
         if (key == pygame.K_ESCAPE):
             self.running = False
         elif (key == pygame.K_d):
-            self.distance_mode = True
-            print("\nDistance mode activated")
-        elif (key == pygame.K_p):
-            self.distance_mode = False
-            print("\nPose mode activated")
+            if (self.distance_mode):
+                self.distance_mode = False
+                print("\nDistance mode deactivated")
+            else:
+                self.distance_mode = True
+                print("\nDistance mode activated")
         elif (key == pygame.K_h):
             if (self.horizontal_mode):
                 self.horizontal_mode = False
@@ -88,11 +89,10 @@ class PoseFinder:
         elif (key == pygame.K_v):
             if (self.vertical_mode):
                 self.vertical_mode = False
-                print("\Vertical mode deactivated")
+                print("\nVertical mode deactivated")
             else:
                 self.vertical_mode = True
-                print("\Vertical mode activated")
-
+                print("\nVertical mode activated")
 
     def get_field_pose(self):
         """Convert robot coords to field pose."""
@@ -105,10 +105,10 @@ class PoseFinder:
         return (field_x, field_y)
     
     def calc_distance(self, start_pose, end_pose):
-        """Find the euclidean distance between 2 poses."""
-        dx = start_pose[0] - end_pose[0]
-        dy = start_pose[1] - end_pose[1]
-        return math.sqrt(dx ** 2 + dy ** 2)
+        """Find the x and y distance between 2 poses."""
+        dx = end_pose[0] - start_pose[0]
+        dy = end_pose[1] - start_pose[1]
+        return dx, dy
     
     def update_robot_pose(self):
         """Update the robot pose."""

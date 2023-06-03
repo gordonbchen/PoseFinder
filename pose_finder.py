@@ -75,6 +75,7 @@ class PoseFinder:
         elif (key == pygame.K_d):
             if (self.distance_mode):
                 self.distance_mode = False
+                self.start_pose = None
                 print("\nDistance mode deactivated")
             else:
                 self.distance_mode = True
